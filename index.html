@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Massal EBTAQ (Final Grid)</title>
+    <title>Cetak Massal EBTAQ (Horizontal Scroll)</title>
     
     <style>
         /* ================================================= */
@@ -25,42 +25,78 @@
             display: flex; flex-direction: column; gap: 20px;
         }
 
-        /* --- BARIS 1: HEADER (JUDUL + PERIODE) --- */
+        /* --- HEADER (JUDUL + PERIODE) --- */
         .row-header { 
             display: flex; gap: 15px; width: 100%; align-items: flex-end;
             border-bottom: 1px dashed #ddd; padding-bottom: 15px;
         }
-        
         .col-judul { flex: 5; }
         .col-bulan { flex: 2; }
         .col-tahun { flex: 1; min-width: 80px; }
 
-        /* --- BARIS 2: GRID UTAMA (STYLE PILIHAN ANDA) --- */
-        .cp-grid-section { display: flex; gap: 20px; }
-        .cp-col { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        /* --- GRID UTAMA (MATERI & SESI) --- */
+        .cp-grid-section { 
+            display: flex; gap: 25px; 
+            /* align-items: stretch PENTING agar tinggi kolom kanan = kolom kiri */
+            align-items: stretch; 
+        }
+        
+        /* Kolom Container */
+        .cp-col { 
+            flex: 1; 
+            display: flex; flex-direction: column; gap: 8px; 
+            /* min-width 0 agar flex work inside */
+            min-width: 0;
+        }
         
         .cp-col h4 { 
-            margin: 0 0 5px 0; font-size: 14px; font-family: Arial, sans-serif; 
-            color: #007bff; border-bottom: 2px solid #eee; padding-bottom: 3px; 
+            margin: 0; font-size: 14px; font-family: Arial, sans-serif; 
+            color: #007bff; border-bottom: 2px solid #eee; padding-bottom: 5px; 
             display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* CHECKBOX GRID 2 KOLOM (SESUAI REQUEST) */
-        .checkbox-group {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-            max-height: 150px; overflow-y: auto; padding: 8px; 
-            border: 1px solid #f0f0f0; background: #fafafa; border-radius: 4px;
+        /* === STYLE KHUSUS MATERI (KIRI) === */
+        /* List menurun biasa dengan scroll Y jika perlu */
+        .materi-list {
+            display: flex; flex-direction: column; gap: 6px;
+            padding: 10px; border: 1px solid #e0e0e0; background: #fafafa; border-radius: 4px;
+            /* Tinggi minimal agar terlihat proporsional */
+            min-height: 200px; 
         }
-        .cb-item { display: flex; align-items: center; gap: 5px; font-size: 13px; font-family: Arial, sans-serif; }
-        .cb-item input { margin: 0; cursor: pointer; }
 
-        /* AREA CUSTOM MATERI (Di Bawah Grid) */
-        .custom-area {
-            margin-top: 5px; padding: 8px; background: #f8f9fa; 
-            border: 1px solid #e9ecef; border-radius: 4px;
-            display: flex; flex-direction: column; gap: 5px;
+        /* === STYLE KHUSUS SESI/SHIFT (KANAN) === */
+        /* List Horizontal Flow (Scroll Kanan-Kiri) */
+        #container-shift-checkbox {
+            flex: 1; /* Mengisi sisa tinggi agar sama dengan kolom kiri */
+            border: 1px solid #e0e0e0; background: #fafafa; border-radius: 4px;
+            padding: 10px;
+            
+            /* MAGIC CSS: Flow Column Wrap */
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap; /* Bungkus ke kolom baru jika mentok bawah */
+            align-content: flex-start; /* Rata kiri */
+            
+            /* Scroll Horizontal */
+            overflow-x: auto;
+            overflow-y: hidden;
+            
+            /* Jarak antar item */
+            gap: 8px 25px; /* Baris 8px, Kolom 25px */
         }
-        .custom-row { display: flex; gap: 8px; align-items: center; }
+
+        .cb-item { 
+            display: flex; align-items: center; gap: 8px; 
+            font-size: 13px; font-family: Arial, sans-serif; 
+            white-space: nowrap; /* Agar teks tidak turun baris */
+        }
+        .cb-item input { margin: 0; cursor: pointer; transform: scale(1.1); }
+
+        /* Area Custom Materi */
+        .custom-area {
+            background: #f8f9fa; padding: 8px; border: 1px solid #e9ecef; border-radius: 4px;
+            display: flex; align-items: center; gap: 10px;
+        }
 
         /* INPUT STYLES */
         .control-group { display: flex; flex-direction: column; gap: 5px; }
@@ -69,7 +105,6 @@
         input[type="text"], select {
             padding: 7px 10px; border: 1px solid #ccc; border-radius: 4px;
             font-size: 14px; width: 100%; box-sizing: border-box; font-family: Arial, sans-serif;
-            transition: border 0.2s;
         }
 
         .btn-generate { 
@@ -80,25 +115,15 @@
         }
         .btn-generate:hover { background-color: #218838; transform: translateY(-1px); }
 
-        /* LABEL HALAMAN */
-        .page-label {
-            display: inline-block; background-color: #333; color: #fff;
-            padding: 5px 15px; border-radius: 20px; font-size: 12px;
-            font-family: Arial, sans-serif; font-weight: bold;
-            margin-top: 15px; margin-bottom: 5px;
-        }
-
         /* ================================================= */
-        /* 2. KERTAS F4 (MARGIN 1.5 CM)                      */
+        /* 2. KERTAS F4 & BLANGKO                            */
         /* ================================================= */
         .page-container {
             background-color: white; width: 215mm; height: 330mm; 
             margin: 0 auto 0 auto; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-            box-sizing: border-box; 
-            padding: 10mm 15mm 15mm 15mm; /* Margin Bawah 15mm */
+            box-sizing: border-box; padding: 10mm 15mm 15mm 15mm; 
             display: flex; flex-direction: column; position: relative;
         }
-
         @page { size: 215mm 330mm; margin: 0; }
         @media print {
             body { background: none; padding: 0; display: block; }
@@ -106,9 +131,7 @@
             .page-container { margin: 0; box-shadow: none; border: none; page-break-after: always; padding: 10mm 15mm 15mm 15mm; }
         }
 
-        /* ================================================= */
-        /* 3. DESAIN BLANGKO (TABEL MELAR)                   */
-        /* ================================================= */
+        /* Desain Blangko (Standard Kita) */
         .kop-surat { display: flex; align-items: center; justify-content: center; margin-bottom: 2px; position: relative; flex-shrink: 0; }
         .logo-container { position: absolute; left: 0; top: 0; bottom: 0; width: 70px; display: flex; align-items: center; justify-content: flex-start; }
         .logo-container img { width: 100%; height: auto; }
@@ -118,53 +141,34 @@
         .kop-t3 { font-size: 12pt; font-weight: bold; text-transform: uppercase; }
         .kop-alamat { font-size: 9pt; margin-top: 2px; }
         .double-line { border-top: 4px solid #000; border-bottom: 1px solid #000; height: 2px; margin-bottom: 10px; flex-shrink: 0; }
-
         .judul-blangko { text-align: center; margin-bottom: 10px; flex-shrink: 0; }
         .jb-main { font-size: 14pt; font-weight: bold; text-transform: uppercase; }
         .jb-sub { font-size: 12pt; font-weight: bold; }
-
         .info-grid { display: flex; justify-content: space-between; font-size: 11pt; font-weight: bold; margin-bottom: 5px; flex-shrink: 0; }
         .info-left, .info-right { width: 48%; }
         .info-row { display: flex; }
-        .label { width: 100px; }
-        .sep { width: 15px; }
-        .val { flex: 1; }
-
-        /* Container Tabel */
-        .split-table-container { 
-            display: flex; gap: 10mm; flex: 1; margin-bottom: 5px;
-        }
-        .table-column { flex: 1; display: flex; flex-direction: column; }
+        .label { width: 100px; } .sep { width: 15px; } .val { flex: 1; }
         
-        table { 
-            width: 100%; height: 100%; /* Auto Height */
-            border-collapse: collapse; font-size: 11pt; 
-        }
-        th { 
-            border: 1px solid #000; padding: 5px; background-color: #f0f0f0; 
-            font-weight: bold; text-align: center; height: 30px; 
-        }
-        td { 
-            border: 1px solid #000; padding: 0 5px; vertical-align: middle; 
-        }
+        .split-table-container { display: flex; gap: 10mm; flex: 1; margin-bottom: 5px; }
+        .table-column { flex: 1; display: flex; flex-direction: column; }
+        table { width: 100%; height: 100%; border-collapse: collapse; font-size: 11pt; }
+        th { border: 1px solid #000; padding: 5px; background-color: #f0f0f0; font-weight: bold; text-align: center; height: 30px; }
+        td { border: 1px solid #000; padding: 0 5px; vertical-align: middle; }
         .col-no { width: 15%; text-align: center; font-weight: bold; }
         .col-nilai { width: 85%; }
-
-        /* Footer Compact */
+        
         .footer-legal { display: flex; justify-content: flex-end; font-size: 11pt; flex-shrink: 0; }
         .sign-box { width: 250px; text-align: center; }
         .sign-space { height: 12mm; } 
         .sign-name { text-decoration: underline; font-weight: bold; }
-        .sign-hint {
-            font-size: 9pt; color: rgba(0,0,0,0.4); font-style: italic; margin-top: 2px;
-            -webkit-print-color-adjust: exact;
-        }
+        .sign-hint { font-size: 9pt; color: rgba(0,0,0,0.4); font-style: italic; margin-top: 2px; -webkit-print-color-adjust: exact; }
+
+        .page-label { display: inline-block; background-color: #333; color: #fff; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-family: Arial, sans-serif; font-weight: bold; margin-top: 15px; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <div class="control-panel">
-        
         <div class="row-header">
             <div class="col-judul">
                 <div class="control-group">
@@ -203,7 +207,7 @@
             
             <div class="cp-col">
                 <h4>1. Pilih Materi</h4>
-                <div class="checkbox-group">
+                <div class="materi-list">
                     <label class="cb-item"><input type="checkbox" name="chk-materi" value="Fashohah"> Fashohah</label>
                     <label class="cb-item"><input type="checkbox" name="chk-materi" value="Tartil"> Tartil</label>
                     <label class="cb-item"><input type="checkbox" name="chk-materi" value="Gharib"> Gharib</label>
@@ -215,13 +219,11 @@
                 </div>
                 
                 <div class="custom-area">
-                    <label style="color:#007bff; margin-bottom:0;">Opsi Lainnya:</label>
-                    <div class="custom-row">
-                        <label class="cb-item" style="color: #d63384;">
-                            <input type="checkbox" id="chk-blank-materi"> Kosongkan
-                        </label>
-                        <input type="text" id="inp-custom-materi" placeholder="Ketik manual..." style="flex:1;">
-                    </div>
+                    <label style="margin:0; font-size:11px; color:#666;">Custom:</label>
+                    <label class="cb-item" style="color: #d63384;">
+                        <input type="checkbox" id="chk-blank-materi"> Kosongkan
+                    </label>
+                    <input type="text" id="inp-custom-materi" placeholder="Ketik manual..." style="flex:1;">
                 </div>
             </div>
 
@@ -232,8 +234,8 @@
                         <input type="checkbox" onchange="toggleAllShifts(this)"> Pilih Semua
                     </label>
                 </h4>
-                <div class="checkbox-group" id="container-shift-checkbox" style="height: 100%; max-height: 190px;">
-                    <div style="padding: 10px; color: #999; font-size: 12px; text-align: center; grid-column: span 2;">Menunggu Data...</div>
+                <div id="container-shift-checkbox">
+                    <div style="padding: 10px; color: #999; font-size: 12px; width: 100%; text-align: center;">Menunggu Data...</div>
                 </div>
             </div>
         </div>
@@ -255,21 +257,17 @@
         let availableShifts = []; 
 
         async function init() {
-            // Auto Tahun
             try {
                 const h = new Intl.DateTimeFormat('id-ID-u-ca-islamic', { year: 'numeric' }).format(new Date());
-                const yearNum = h.match(/\d+/)[0]; 
-                document.getElementById('inp-tahun').value = yearNum + " H";
+                document.getElementById('inp-tahun').value = h.match(/\d+/)[0] + " H";
             } catch(e) {}
 
-            // Load Judul
             if(localStorage.getItem('ebtaq_judul')) {
                 document.getElementById('inp-judul').value = localStorage.getItem('ebtaq_judul');
             } else {
                 document.getElementById('inp-judul').value = "Evaluasi Belajar Tahap Akhir Qiroati (EBTAQ)";
             }
 
-            // Fetch
             try {
                 const res = await fetch(SHEET_URL);
                 const txt = await res.text();
@@ -341,13 +339,11 @@
             output.innerHTML = '';
             document.getElementById('welcome-msg').style.display = 'none';
 
-            // Ambil Data
             const judul = document.getElementById('inp-judul').value;
             const bulan = document.getElementById('inp-bulan').value;
             const tahun = document.getElementById('inp-tahun').value;
             localStorage.setItem('ebtaq_judul', judul); 
 
-            // Logic Materi
             let materialsToPrint = [];
             
             const chkMats = document.querySelectorAll('input[name="chk-materi"]:checked');
@@ -362,14 +358,12 @@
                 return;
             }
 
-            // Logic Sesi
             const chkShifts = document.querySelectorAll('input[name="chk-shift"]:checked');
             if(chkShifts.length === 0) {
                 alert("Pilih Sesi terlebih dahulu!");
                 return;
             }
 
-            // Generate
             materialsToPrint.forEach(materiName => {
                 chkShifts.forEach(shiftCb => {
                     const shiftKey = shiftCb.value;
@@ -398,7 +392,6 @@
             const div = document.createElement('div');
             div.className = 'page-container';
 
-            // Rows
             const makeRows = (arr, max) => {
                 let h = '';
                 arr.forEach(p => h += `<tr><td class="col-no">${p.DISP_NO}</td><td class="col-nilai"></td></tr>`);
