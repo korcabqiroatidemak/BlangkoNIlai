@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blangko Rekap Nilai (Format Demak)</title>
+    <title>Blangko Rekap Nilai (Final Control)</title>
     
     <style>
         /* ================================================= */
@@ -20,27 +20,55 @@
             min-height: 100vh;
         }
 
-        /* CONTROL PANEL (Hanya Tampil di Layar) */
+        /* CONTROL PANEL (DESAIN BARU) */
         .control-panel {
             background-color: #fff;
-            padding: 15px 25px;
+            padding: 20px 30px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-            width: 215mm;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
+            width: 215mm; /* Sama dengan lebar kertas */
             box-sizing: border-box;
+            
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* Agar bisa turun baris */
             gap: 15px;
-            align-items: center;
-            justify-content: center;
+            align-items: flex-end; /* Ratakan bawah agar tombol sejajar input */
         }
-        .control-group { display: flex; flex-direction: column; gap: 5px; }
-        .control-group label { font-size: 12px; font-weight: bold; font-family: Arial, sans-serif; color: #555; }
-        .control-group input[type="text"] { padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 200px; }
+
+        /* Group Styling */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .control-group label {
+            font-size: 13px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            color: #444;
+        }
+
+        /* INPUT STYLING */
+        .w-full { flex: 0 0 100%; } /* Lebar Penuh untuk Judul */
+        .w-auto { flex: 1; min-width: 150px; } /* Lebar Otomatis untuk opsi lain */
+        .w-small { flex: 0 0 100px; } /* Lebar Kecil untuk Tahun */
+
+        input[type="text"], select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
         .btn-refresh { 
-            background-color: #007bff; color: white; border: none; padding: 8px 15px; 
-            border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: auto; 
+            background-color: #007bff; color: white; border: none; padding: 9px 20px; 
+            border-radius: 4px; cursor: pointer; font-weight: bold; font-family: Arial, sans-serif;
+            height: 38px; /* Samakan tinggi dengan input */
         }
         .btn-refresh:hover { background-color: #0056b3; }
 
@@ -54,7 +82,7 @@
             font-size: 13px;
             font-family: Arial, sans-serif;
             font-weight: bold;
-            margin-top: 20px;
+            margin-top: 10px;
             margin-bottom: 5px;
         }
 
@@ -90,58 +118,36 @@
         }
 
         /* ================================================= */
-        /* 4. DESAIN BLANGKO (SESUAI GAMBAR)                 */
+        /* 4. DESAIN BLANGKO                                 */
         /* ================================================= */
-        
-        /* KOP SURAT */
         .kop-surat {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 2px;
-            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 2px; position: relative;
         }
         .logo-container {
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 70px;
+            position: absolute; left: 0; top: 0; bottom: 0; width: 70px;
             display: flex; align-items: center; justify-content: flex-start;
         }
         .logo-container img { width: 100%; height: auto; }
-        
         .kop-text {
-            text-align: center;
-            flex: 1;
-            padding-left: 70px; /* Kompensasi logo */
-            padding-right: 70px;
+            text-align: center; flex: 1; padding-left: 70px; padding-right: 70px;
         }
         .kop-t1 { font-size: 12pt; font-weight: bold; letter-spacing: 1px; }
         .kop-t2 { font-size: 22pt; font-weight: 900; margin: 2px 0; }
         .kop-t3 { font-size: 12pt; font-weight: bold; text-transform: uppercase; }
         .kop-alamat { font-size: 9pt; margin-top: 2px; }
-
         .double-line {
-            border-top: 4px solid #000;
-            border-bottom: 1px solid #000;
-            height: 2px;
-            margin-bottom: 15px;
+            border-top: 4px solid #000; border-bottom: 1px solid #000;
+            height: 2px; margin-bottom: 15px;
         }
 
-        /* JUDUL BLANGKO */
-        .judul-blangko {
-            text-align: center;
-            margin-bottom: 15px;
-        }
+        /* JUDUL & INFO */
+        .judul-blangko { text-align: center; margin-bottom: 15px; }
         .jb-main { font-size: 14pt; font-weight: bold; text-transform: uppercase; }
         .jb-sub { font-size: 12pt; font-weight: bold; }
 
-        /* INFO GRID (Periode, Materi, Gel, Shift) */
         .info-grid {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11pt;
-            font-weight: bold;
-            margin-bottom: 10px;
+            display: flex; justify-content: space-between; font-size: 11pt; font-weight: bold; margin-bottom: 10px;
         }
         .info-left, .info-right { width: 48%; }
         .info-row { display: flex; }
@@ -149,43 +155,22 @@
         .sep { width: 15px; }
         .val { flex: 1; }
 
-        /* TABEL 2 KOLOM (SPLIT GRID) */
-        .split-table-container {
-            display: flex;
-            gap: 10mm; /* Jarak antar lajur kiri dan kanan */
-            flex: 1; /* Mengisi sisa ruang */
-        }
+        /* TABEL */
+        .split-table-container { display: flex; gap: 10mm; flex: 1; }
         .table-column { flex: 1; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11pt;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 11pt; }
         th {
-            border: 1px solid #000;
-            padding: 5px;
-            background-color: #f0f0f0;
-            font-weight: bold;
-            text-align: center;
-            -webkit-print-color-adjust: exact;
+            border: 1px solid #000; padding: 5px; background-color: #f0f0f0;
+            font-weight: bold; text-align: center; -webkit-print-color-adjust: exact;
         }
         td {
-            border: 1px solid #000;
-            padding: 4px 8px; /* Padding baris */
-            height: 24px; /* Tinggi baris tetap agar rapi */
-            vertical-align: middle;
+            border: 1px solid #000; padding: 4px 8px; height: 24px; vertical-align: middle;
         }
         .col-no { width: 15%; text-align: center; font-weight: bold; }
         .col-nilai { width: 85%; }
 
-        /* LEGALISASI / TANDA TANGAN */
-        .footer-legal {
-            margin-top: 10px;
-            display: flex;
-            justify-content: flex-end;
-            font-size: 11pt;
-        }
+        /* FOOTER */
+        .footer-legal { margin-top: 10px; display: flex; justify-content: flex-end; font-size: 11pt; }
         .sign-box { width: 250px; text-align: center; }
         .sign-space { height: 20mm; }
         .sign-name { text-decoration: underline; font-weight: bold; }
@@ -195,19 +180,50 @@
 <body>
 
     <div class="control-panel">
-        <div class="control-group">
-            <label>Judul Kegiatan (Bisa Diubah)</label>
+        
+        <div class="control-group w-full">
+            <label>Judul Kegiatan</label>
             <input type="text" id="inp-judul" value="Evaluasi Belajar Tahap Akhir Qiroati (EBTAQ)">
         </div>
-        <div class="control-group">
-            <label>Periode / Bulan</label>
-            <input type="text" id="inp-bulan" value="Rojab 1447">
+
+        <div class="control-group w-auto">
+            <label>Bulan</label>
+            <select id="inp-bulan">
+                <option value="Rojab" selected>Rojab</option>
+                <option value="Muharrom">Muharrom</option>
+                <option value="Shofar">Shofar</option>
+                <option value="Rabi'ul Awal">Rabi'ul Awal</option>
+                <option value="Rabi'ul Akhir">Rabi'ul Akhir</option>
+                <option value="Jumadil Awal">Jumadil Awal</option>
+                <option value="Jumadil Akhir">Jumadil Akhir</option>
+                <option value="Sya'ban">Sya'ban</option>
+                <option value="Ramadhan">Ramadhan</option>
+                <option value="Syawal">Syawal</option>
+                <option value="Dzulqa'dah">Dzulqa'dah</option>
+                <option value="Dzulhijjah">Dzulhijjah</option>
+            </select>
         </div>
-        <div class="control-group">
-            <label>Materi / Mapel</label>
-            <input type="text" id="inp-materi" value="Fashohah">
+
+        <div class="control-group w-small">
+            <label>Tahun</label>
+            <input type="text" id="inp-tahun" value="1447 H">
         </div>
-        <button class="btn-refresh" onclick="refreshData()">Terapkan & Muat Ulang</button>
+
+        <div class="control-group w-auto">
+            <label>Materi Ujian</label>
+            <select id="inp-materi">
+                <option value="Fashohah" selected>Fashohah</option>
+                <option value="Tartil">Tartil</option>
+                <option value="Gharib">Gharib</option>
+                <option value="Tajwid">Tajwid</option>
+                <option value="DDH">DDH</option>
+                <option value="SSP">SSP</option>
+                <option value="Sholat">Sholat</option>
+                <option value="Wudhu">Wudhu</option>
+            </select>
+        </div>
+
+        <button class="btn-refresh" onclick="refreshData()">Update Tampilan</button>
     </div>
 
     <div id="loading" style="text-align: center; margin-top: 50px; color: white;">
@@ -221,24 +237,23 @@
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Biodata Cek`; 
         const LOGO_FILENAME = "QIRAATI.png"; 
 
-        // State Global untuk menyimpan input user
+        // State Global
         let config = {
-            judul: "Evaluasi Belajar Tahap Akhir Qiroati (EBTAQ)",
-            bulan: "Rojab 1447",
-            materi: "Fashohah"
+            judul: "",
+            bulan: "",
+            tahun: "",
+            materi: ""
         };
 
-        // Simpan data mentah agar tidak perlu fetch ulang saat ganti judul
         let rawData = [];
 
         async function init() {
-            // Ambil data dari spreadsheet sekali saja
             try {
                 const response = await fetch(SHEET_URL);
                 const csvText = await response.text();
                 processRawData(csvText);
                 document.getElementById('loading').style.display = 'none';
-                renderDocs(); // Render pertama kali
+                refreshData(); // Panggil ini untuk set config awal
             } catch (error) {
                 document.getElementById('loading').innerText = "Gagal memuat data: " + error.message;
             }
@@ -254,13 +269,9 @@
                 let p = {};
                 rowData.forEach((val, idx) => { p[headers[idx]] = val ? val.trim().replace(/"/g, '') : ''; });
                 
-                // Pastikan NOMOR ada dan berupa angka untuk sorting
-                // Jika kosong, gunakan index + 1
                 let noStr = p['NOMOR'] || p['Nomor'];
                 p['INT_NO'] = noStr ? parseInt(noStr) : (i); 
                 p['DISP_NO'] = noStr ? String(noStr).padStart(3, '0') : String(i).padStart(3, '0');
-                
-                // Normalisasi Data Gelombang & Shift
                 p['GEL'] = (p['Gelombang'] || '-').trim();
                 p['SHIFT'] = (p['Shift'] || '-').trim();
 
@@ -269,21 +280,19 @@
         }
 
         function refreshData() {
-            // Update config dari input user
+            // Update config dari Panel Kontrol
             config.judul = document.getElementById('inp-judul').value;
             config.bulan = document.getElementById('inp-bulan').value;
+            config.tahun = document.getElementById('inp-tahun').value;
             config.materi = document.getElementById('inp-materi').value;
             
-            // Render ulang tanpa fetch
             renderDocs();
         }
 
         function renderDocs() {
             const output = document.getElementById('main-output');
-            output.innerHTML = ''; // Bersihkan output lama
+            output.innerHTML = ''; 
 
-            // 1. GROUPING: Kelompokkan data berdasarkan "GEL-SHIFT"
-            //    Contoh Key: "1-1", "1-2", "2-1"
             let groups = {};
             rawData.forEach(p => {
                 const key = `${p['GEL']}-${p['SHIFT']}`;
@@ -291,7 +300,6 @@
                 groups[key].push(p);
             });
 
-            // 2. SORTING KEYS: Agar urut Gel 1 Shift 1, Gel 1 Shift 2, dst.
             const sortedKeys = Object.keys(groups).sort((a, b) => {
                 const [g1, s1] = a.split('-').map(Number);
                 const [g2, s2] = b.split('-').map(Number);
@@ -299,14 +307,10 @@
                 return s1 - s2;
             });
 
-            // 3. LOOP PER GROUP (Per Sesi Ujian)
             let globalPageCount = 1;
             
             sortedKeys.forEach(key => {
-                // Sort Peserta dalam group ini berdasarkan Nomor
                 let participants = groups[key].sort((a, b) => a['INT_NO'] - b['INT_NO']);
-
-                // Pecah per 50 siswa (Kapasitas F4 Split Column)
                 const PER_PAGE = 50;
                 const totalGroupPages = Math.ceil(participants.length / PER_PAGE);
 
@@ -315,50 +319,42 @@
                     const end = start + PER_PAGE;
                     const chunk = participants.slice(start, end);
                     
-                    // Ambil info Gelombang & Shift dari peserta pertama di chunk ini
                     const currentGel = chunk[0]['GEL'];
                     const currentShift = chunk[0]['SHIFT'];
 
                     const pageDiv = createPageHTML(chunk, currentGel, currentShift);
                     
-                    // Tambahkan Label Halaman (Hanya di layar)
                     const label = document.createElement('div');
                     label.className = 'page-label';
                     label.innerText = `SESI: GEL ${currentGel} SHIFT ${currentShift} | HALAMAN ${i+1} DARI ${totalGroupPages} (Total Urutan: ${globalPageCount})`;
                     
                     output.appendChild(label);
                     output.appendChild(pageDiv);
-                    
                     globalPageCount++;
                 }
             });
         }
 
         function getShiftDisplay(shiftCode) {
-            // Mapping Angka ke Romawi + Jam sesuai diskusi sebelumnya
             const s = String(shiftCode).trim();
             if (s === '1') return 'I (07.00 WIB)';
             if (s === '2') return 'II (08.30 WIB)';
             if (s === '3') return 'III (10.00 WIB)';
-            return s; // Fallback jika format beda
+            return s; 
         }
 
         function createPageHTML(participants, gel, shift) {
             const page = document.createElement('div');
             page.className = 'page-container';
 
-            // Pisahkan 50 data menjadi Kiri (25) dan Kanan (25)
             const leftData = participants.slice(0, 25);
             const rightData = participants.slice(25, 50);
 
-            // Fungsi helper bikin baris tabel
             const createRows = (dataArr, maxRows) => {
                 let html = '';
-                // Isi data yang ada
                 dataArr.forEach(p => {
                     html += `<tr><td class="col-no">${p['DISP_NO']}</td><td class="col-nilai"></td></tr>`;
                 });
-                // Isi sisa baris kosong agar tabel tetap panjang ke bawah (Estetika)
                 const remaining = maxRows - dataArr.length;
                 for (let k = 0; k < remaining; k++) {
                     html += `<tr><td class="col-no">&nbsp;</td><td class="col-nilai"></td></tr>`;
@@ -368,6 +364,9 @@
 
             const leftRows = createRows(leftData, 25);
             const rightRows = createRows(rightData, 25);
+
+            // Gabungkan Bulan + Tahun untuk tampilan
+            const periodeDisplay = `${config.bulan} ${config.tahun}`;
 
             page.innerHTML = `
                 <div class="kop-surat">
@@ -391,7 +390,7 @@
                 <div class="info-grid">
                     <div class="info-left">
                         <div class="info-row">
-                            <div class="label">Periode</div><div class="sep">:</div><div class="val">${config.bulan}</div>
+                            <div class="label">Periode</div><div class="sep">:</div><div class="val">${periodeDisplay}</div>
                         </div>
                         <div class="info-row">
                             <div class="label">Materi</div><div class="sep">:</div><div class="val">${config.materi}</div>
@@ -410,18 +409,13 @@
                 <div class="split-table-container">
                     <div class="table-column">
                         <table>
-                            <thead>
-                                <tr><th class="col-no">NO</th><th class="col-nilai">NILAI</th></tr>
-                            </thead>
+                            <thead><tr><th class="col-no">NO</th><th class="col-nilai">NILAI</th></tr></thead>
                             <tbody>${leftRows}</tbody>
                         </table>
                     </div>
-                    
                     <div class="table-column">
                         <table>
-                            <thead>
-                                <tr><th class="col-no">NO</th><th class="col-nilai">NILAI</th></tr>
-                            </thead>
+                            <thead><tr><th class="col-no">NO</th><th class="col-nilai">NILAI</th></tr></thead>
                             <tbody>${rightRows}</tbody>
                         </table>
                     </div>
