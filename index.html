@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blangko Rekap Nilai (Validation Mode)</title>
+    <title>Blangko Rekap Nilai (Final Fix Double H)</title>
     
     <style>
         /* ================================================= */
-        /* 1. STYLE CONTROL PANEL (VALIDASI)                 */
+        /* 1. STYLE CONTROL PANEL                            */
         /* ================================================= */
         body {
             font-family: 'Times New Roman', Times, serif;
@@ -22,20 +22,18 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 25px;
             width: 215mm; box-sizing: border-box;
             display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start;
-            border-top: 5px solid #007bff; /* Aksen warna */
+            border-top: 5px solid #007bff;
         }
 
         .control-group { display: flex; flex-direction: column; gap: 5px; position: relative; }
         .control-group label { font-size: 13px; font-weight: bold; font-family: Arial, sans-serif; color: #444; }
-        .control-group label .req { color: red; margin-left: 2px; } /* Bintang merah */
+        .control-group label .req { color: red; margin-left: 2px; }
 
-        /* ERROR MESSAGE */
         .error-msg {
             color: #dc3545; font-family: Arial, sans-serif; font-size: 11px;
             position: absolute; bottom: -18px; left: 0; display: none;
         }
         
-        /* INPUT STYLING */
         .w-full { flex: 0 0 100%; } 
         .w-auto { flex: 1; min-width: 150px; } 
         .w-small { flex: 0 0 100px; } 
@@ -45,22 +43,17 @@
             font-size: 14px; width: 100%; box-sizing: border-box; font-family: Arial, sans-serif;
             transition: border 0.2s;
         }
-
-        /* Style saat Error */
-        input.input-error, select.input-error {
-            border-color: #dc3545; background-color: #fff8f8;
-        }
+        input.input-error, select.input-error { border-color: #dc3545; background-color: #fff8f8; }
 
         .btn-refresh { 
             background-color: #007bff; color: white; border: none; padding: 9px 25px; 
             border-radius: 4px; cursor: pointer; font-weight: bold; font-family: Arial, sans-serif;
-            height: 38px; margin-top: 21px; /* Sejajar label */
+            height: 38px; margin-top: 21px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: all 0.2s;
         }
         .btn-refresh:hover { background-color: #0056b3; transform: translateY(-1px); }
         .btn-refresh:active { transform: translateY(1px); }
 
-        /* LABEL HALAMAN */
         .page-label {
             display: inline-block; background-color: #222; color: #fff;
             padding: 4px 12px; border-radius: 4px; font-size: 13px;
@@ -68,10 +61,7 @@
             margin-top: 10px; margin-bottom: 5px;
         }
 
-        /* PESAN SELAMAT DATANG (SAAT KOSONG) */
-        .welcome-msg {
-            text-align: center; color: white; font-family: Arial, sans-serif; margin-top: 50px;
-        }
+        .welcome-msg { text-align: center; color: white; font-family: Arial, sans-serif; margin-top: 50px; }
 
         /* ================================================= */
         /* 2. KERTAS F4                                      */
@@ -83,9 +73,6 @@
             display: flex; flex-direction: column; position: relative;
         }
 
-        /* ================================================= */
-        /* 3. PRINT SETTINGS                                 */
-        /* ================================================= */
         @page { size: 215mm 330mm; margin: 0; }
         @media print {
             body { background: none; padding: 0; display: block; }
@@ -94,7 +81,7 @@
         }
 
         /* ================================================= */
-        /* 4. DESAIN BLANGKO                                 */
+        /* 3. DESAIN BLANGKO                                 */
         /* ================================================= */
         .kop-surat { display: flex; align-items: center; justify-content: center; margin-bottom: 2px; position: relative; }
         .logo-container { position: absolute; left: 0; top: 0; bottom: 0; width: 70px; display: flex; align-items: center; justify-content: flex-start; }
@@ -134,13 +121,11 @@
 <body>
 
     <div class="control-panel">
-        
         <div class="control-group w-full">
             <label>Judul Kegiatan <span class="req">*</span></label>
             <input type="text" id="inp-judul" placeholder="Masukkan Judul Kegiatan...">
             <span class="error-msg">Judul wajib diisi!</span>
         </div>
-
         <div class="control-group w-auto">
             <label>Bulan / Periode <span class="req">*</span></label>
             <select id="inp-bulan">
@@ -160,13 +145,11 @@
             </select>
             <span class="error-msg">Pilih bulan!</span>
         </div>
-
         <div class="control-group w-small">
             <label>Tahun <span class="req">*</span></label>
             <input type="text" id="inp-tahun" placeholder="Contoh: 1447 H">
             <span class="error-msg">Isi tahun!</span>
         </div>
-
         <div class="control-group w-auto">
             <label>Materi Ujian <span class="req">*</span></label>
             <select id="inp-materi">
@@ -182,7 +165,6 @@
             </select>
             <span class="error-msg">Pilih materi!</span>
         </div>
-
         <button class="btn-refresh" onclick="validateAndProcess()">Simpan & Tampilkan</button>
     </div>
 
@@ -207,33 +189,37 @@
         let isDataLoaded = false;
 
         async function init() {
-            // 1. Cek Local Storage dulu
             const savedJudul = localStorage.getItem('ebtaq_judul');
             const savedBulan = localStorage.getItem('ebtaq_bulan');
             const savedTahun = localStorage.getItem('ebtaq_tahun');
             const savedMateri = localStorage.getItem('ebtaq_materi');
 
-            // 2. Jika ada data tersimpan, isi form
             if (savedJudul && savedBulan && savedTahun && savedMateri) {
                 document.getElementById('inp-judul').value = savedJudul;
                 document.getElementById('inp-bulan').value = savedBulan;
                 document.getElementById('inp-tahun').value = savedTahun;
                 document.getElementById('inp-materi').value = savedMateri;
                 
-                // Load data dan langsung render
                 await loadSheetData(true);
             } else {
-                // Jika data kosong (Pertama kali / Clear Cache)
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('welcome-msg').style.display = 'block';
 
-                // --- SMART SUGGESTION (Hanya saran, tidak disimpan) ---
-                // Isi tahun otomatis di placeholder atau value sementara, tapi user wajib klik simpan
                 try {
+                    // --- FIX LOGIKA TAHUN GANDA ---
+                    // 1. Ambil format tanggal Islam dari browser
                     const hijriDate = new Intl.DateTimeFormat('id-ID-u-ca-islamic', { year: 'numeric' }).format(new Date());
-                    const yearStr = hijriDate.replace(' AH', '') + " H";
-                    document.getElementById('inp-tahun').value = yearStr; // Pre-fill agar user tidak capek ngetik
-                } catch(e) {}
+                    
+                    // 2. Ambil HANYA ANGKA (Regex: \d+)
+                    const yearOnly = hijriDate.match(/\d+/)[0]; 
+                    
+                    // 3. Tambahkan " H" secara manual
+                    const yearStr = yearOnly + " H";
+                    
+                    document.getElementById('inp-tahun').value = yearStr; 
+                } catch(e) {
+                    console.log("Gagal deteksi tahun otomatis", e);
+                }
             }
         }
 
@@ -242,7 +228,7 @@
             document.getElementById('welcome-msg').style.display = 'none';
             
             try {
-                if(rawData.length === 0) { // Fetch hanya jika belum punya data
+                if(rawData.length === 0) {
                     const response = await fetch(SHEET_URL);
                     const csvText = await response.text();
                     processRawData(csvText);
@@ -272,15 +258,12 @@
             }
         }
 
-        // --- FUNGSI VALIDASI ---
         function validateAndProcess() {
-            // Ambil elemen
             const elJudul = document.getElementById('inp-judul');
             const elBulan = document.getElementById('inp-bulan');
             const elTahun = document.getElementById('inp-tahun');
             const elMateri = document.getElementById('inp-materi');
 
-            // Reset Error Styles
             [elJudul, elBulan, elTahun, elMateri].forEach(el => {
                 el.classList.remove('input-error');
                 const msg = el.parentElement.querySelector('.error-msg');
@@ -288,27 +271,13 @@
             });
 
             let isValid = true;
+            if (!elJudul.value.trim()) { setError(elJudul); isValid = false; }
+            if (!elBulan.value) { setError(elBulan); isValid = false; }
+            if (!elTahun.value.trim()) { setError(elTahun); isValid = false; }
+            if (!elMateri.value) { setError(elMateri); isValid = false; }
 
-            // Cek Judul
-            if (!elJudul.value.trim()) {
-                setError(elJudul); isValid = false;
-            }
-            // Cek Bulan
-            if (!elBulan.value) {
-                setError(elBulan); isValid = false;
-            }
-            // Cek Tahun
-            if (!elTahun.value.trim()) {
-                setError(elTahun); isValid = false;
-            }
-            // Cek Materi
-            if (!elMateri.value) {
-                setError(elMateri); isValid = false;
-            }
+            if (!isValid) return;
 
-            if (!isValid) return; // Stop jika tidak valid
-
-            // Jika Valid -> Simpan ke Storage & Proses
             localStorage.setItem('ebtaq_judul', elJudul.value);
             localStorage.setItem('ebtaq_bulan', elBulan.value);
             localStorage.setItem('ebtaq_tahun', elTahun.value);
