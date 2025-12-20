@@ -3,178 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blangko Rekap Nilai (Final Control)</title>
+    <title>Blangko Rekap Nilai (Validation Mode)</title>
     
     <style>
         /* ================================================= */
-        /* 1. LAYOUT UMUM & CONTROL PANEL                    */
+        /* 1. STYLE CONTROL PANEL (VALIDASI)                 */
         /* ================================================= */
         body {
             font-family: 'Times New Roman', Times, serif;
             background-color: #525659;
-            margin: 0;
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0; padding: 20px 0;
+            display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
         }
 
-        /* CONTROL PANEL (DESAIN BARU) */
         .control-panel {
-            background-color: #fff;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            margin-bottom: 25px;
-            width: 215mm; /* Sama dengan lebar kertas */
-            box-sizing: border-box;
-            
-            display: flex;
-            flex-wrap: wrap; /* Agar bisa turun baris */
-            gap: 15px;
-            align-items: flex-end; /* Ratakan bawah agar tombol sejajar input */
+            background-color: #fff; padding: 25px 30px; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 25px;
+            width: 215mm; box-sizing: border-box;
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start;
+            border-top: 5px solid #007bff; /* Aksen warna */
         }
 
-        /* Group Styling */
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+        .control-group { display: flex; flex-direction: column; gap: 5px; position: relative; }
+        .control-group label { font-size: 13px; font-weight: bold; font-family: Arial, sans-serif; color: #444; }
+        .control-group label .req { color: red; margin-left: 2px; } /* Bintang merah */
+
+        /* ERROR MESSAGE */
+        .error-msg {
+            color: #dc3545; font-family: Arial, sans-serif; font-size: 11px;
+            position: absolute; bottom: -18px; left: 0; display: none;
         }
         
-        .control-group label {
-            font-size: 13px;
-            font-weight: bold;
-            font-family: Arial, sans-serif;
-            color: #444;
-        }
-
         /* INPUT STYLING */
-        .w-full { flex: 0 0 100%; } /* Lebar Penuh untuk Judul */
-        .w-auto { flex: 1; min-width: 150px; } /* Lebar Otomatis untuk opsi lain */
-        .w-small { flex: 0 0 100px; } /* Lebar Kecil untuk Tahun */
+        .w-full { flex: 0 0 100%; } 
+        .w-auto { flex: 1; min-width: 150px; } 
+        .w-small { flex: 0 0 100px; } 
 
         input[type="text"], select {
-            padding: 8px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px;
+            font-size: 14px; width: 100%; box-sizing: border-box; font-family: Arial, sans-serif;
+            transition: border 0.2s;
+        }
+
+        /* Style saat Error */
+        input.input-error, select.input-error {
+            border-color: #dc3545; background-color: #fff8f8;
         }
 
         .btn-refresh { 
-            background-color: #007bff; color: white; border: none; padding: 9px 20px; 
+            background-color: #007bff; color: white; border: none; padding: 9px 25px; 
             border-radius: 4px; cursor: pointer; font-weight: bold; font-family: Arial, sans-serif;
-            height: 38px; /* Samakan tinggi dengan input */
+            height: 38px; margin-top: 21px; /* Sejajar label */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: all 0.2s;
         }
-        .btn-refresh:hover { background-color: #0056b3; }
+        .btn-refresh:hover { background-color: #0056b3; transform: translateY(-1px); }
+        .btn-refresh:active { transform: translateY(1px); }
 
         /* LABEL HALAMAN */
         .page-label {
-            display: inline-block;
-            background-color: #222;
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 13px;
-            font-family: Arial, sans-serif;
-            font-weight: bold;
-            margin-top: 10px;
-            margin-bottom: 5px;
+            display: inline-block; background-color: #222; color: #fff;
+            padding: 4px 12px; border-radius: 4px; font-size: 13px;
+            font-family: Arial, sans-serif; font-weight: bold;
+            margin-top: 10px; margin-bottom: 5px;
+        }
+
+        /* PESAN SELAMAT DATANG (SAAT KOSONG) */
+        .welcome-msg {
+            text-align: center; color: white; font-family: Arial, sans-serif; margin-top: 50px;
         }
 
         /* ================================================= */
         /* 2. KERTAS F4                                      */
         /* ================================================= */
         .page-container {
-            background-color: white;
-            width: 215mm; 
-            height: 330mm; 
-            margin: 0 auto 0 auto; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            box-sizing: border-box;
-            padding: 10mm 15mm 10mm 15mm; /* Margin Kertas */
-            
-            display: flex;
-            flex-direction: column;
-            position: relative;
+            background-color: white; width: 215mm; height: 330mm; 
+            margin: 0 auto 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            box-sizing: border-box; padding: 10mm 15mm 10mm 15mm; 
+            display: flex; flex-direction: column; position: relative;
         }
 
         /* ================================================= */
         /* 3. PRINT SETTINGS                                 */
         /* ================================================= */
         @page { size: 215mm 330mm; margin: 0; }
-
         @media print {
             body { background: none; padding: 0; display: block; }
-            .control-panel, .page-label, #loading { display: none !important; }
-            .page-container { 
-                margin: 0; box-shadow: none; border: none; 
-                page-break-after: always; padding: 10mm 15mm 10mm 15mm; 
-            }
+            .control-panel, .page-label, .welcome-msg, #loading { display: none !important; }
+            .page-container { margin: 0; box-shadow: none; border: none; page-break-after: always; padding: 10mm 15mm 10mm 15mm; }
         }
 
         /* ================================================= */
         /* 4. DESAIN BLANGKO                                 */
         /* ================================================= */
-        .kop-surat {
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 2px; position: relative;
-        }
-        .logo-container {
-            position: absolute; left: 0; top: 0; bottom: 0; width: 70px;
-            display: flex; align-items: center; justify-content: flex-start;
-        }
+        .kop-surat { display: flex; align-items: center; justify-content: center; margin-bottom: 2px; position: relative; }
+        .logo-container { position: absolute; left: 0; top: 0; bottom: 0; width: 70px; display: flex; align-items: center; justify-content: flex-start; }
         .logo-container img { width: 100%; height: auto; }
-        .kop-text {
-            text-align: center; flex: 1; padding-left: 70px; padding-right: 70px;
-        }
+        .kop-text { text-align: center; flex: 1; padding-left: 70px; padding-right: 70px; }
         .kop-t1 { font-size: 12pt; font-weight: bold; letter-spacing: 1px; }
         .kop-t2 { font-size: 22pt; font-weight: 900; margin: 2px 0; }
         .kop-t3 { font-size: 12pt; font-weight: bold; text-transform: uppercase; }
         .kop-alamat { font-size: 9pt; margin-top: 2px; }
-        .double-line {
-            border-top: 4px solid #000; border-bottom: 1px solid #000;
-            height: 2px; margin-bottom: 15px;
-        }
+        .double-line { border-top: 4px solid #000; border-bottom: 1px solid #000; height: 2px; margin-bottom: 15px; }
 
-        /* JUDUL & INFO */
         .judul-blangko { text-align: center; margin-bottom: 15px; }
         .jb-main { font-size: 14pt; font-weight: bold; text-transform: uppercase; }
         .jb-sub { font-size: 12pt; font-weight: bold; }
 
-        .info-grid {
-            display: flex; justify-content: space-between; font-size: 11pt; font-weight: bold; margin-bottom: 10px;
-        }
+        .info-grid { display: flex; justify-content: space-between; font-size: 11pt; font-weight: bold; margin-bottom: 10px; }
         .info-left, .info-right { width: 48%; }
         .info-row { display: flex; }
         .label { width: 100px; }
         .sep { width: 15px; }
         .val { flex: 1; }
 
-        /* TABEL */
         .split-table-container { display: flex; gap: 10mm; flex: 1; }
         .table-column { flex: 1; }
         table { width: 100%; border-collapse: collapse; font-size: 11pt; }
-        th {
-            border: 1px solid #000; padding: 5px; background-color: #f0f0f0;
-            font-weight: bold; text-align: center; -webkit-print-color-adjust: exact;
-        }
-        td {
-            border: 1px solid #000; padding: 4px 8px; height: 24px; vertical-align: middle;
-        }
+        th { border: 1px solid #000; padding: 5px; background-color: #f0f0f0; font-weight: bold; text-align: center; -webkit-print-color-adjust: exact; }
+        td { border: 1px solid #000; padding: 4px 8px; height: 24px; vertical-align: middle; }
         .col-no { width: 15%; text-align: center; font-weight: bold; }
         .col-nilai { width: 85%; }
 
-        /* FOOTER */
         .footer-legal { margin-top: 10px; display: flex; justify-content: flex-end; font-size: 11pt; }
         .sign-box { width: 250px; text-align: center; }
         .sign-space { height: 20mm; }
         .sign-name { text-decoration: underline; font-weight: bold; }
-
     </style>
 </head>
 <body>
@@ -182,37 +136,42 @@
     <div class="control-panel">
         
         <div class="control-group w-full">
-            <label>Judul Kegiatan</label>
-            <input type="text" id="inp-judul" value="Evaluasi Belajar Tahap Akhir Qiroati (EBTAQ)">
+            <label>Judul Kegiatan <span class="req">*</span></label>
+            <input type="text" id="inp-judul" placeholder="Masukkan Judul Kegiatan...">
+            <span class="error-msg">Judul wajib diisi!</span>
         </div>
 
         <div class="control-group w-auto">
-            <label>Bulan</label>
+            <label>Bulan / Periode <span class="req">*</span></label>
             <select id="inp-bulan">
-                <option value="Rojab" selected>Rojab</option>
+                <option value="" disabled selected>-- Pilih Bulan --</option>
                 <option value="Muharrom">Muharrom</option>
                 <option value="Shofar">Shofar</option>
                 <option value="Rabi'ul Awal">Rabi'ul Awal</option>
                 <option value="Rabi'ul Akhir">Rabi'ul Akhir</option>
                 <option value="Jumadil Awal">Jumadil Awal</option>
                 <option value="Jumadil Akhir">Jumadil Akhir</option>
+                <option value="Rojab">Rojab</option>
                 <option value="Sya'ban">Sya'ban</option>
                 <option value="Ramadhan">Ramadhan</option>
                 <option value="Syawal">Syawal</option>
                 <option value="Dzulqa'dah">Dzulqa'dah</option>
                 <option value="Dzulhijjah">Dzulhijjah</option>
             </select>
+            <span class="error-msg">Pilih bulan!</span>
         </div>
 
         <div class="control-group w-small">
-            <label>Tahun</label>
-            <input type="text" id="inp-tahun" value="1447 H">
+            <label>Tahun <span class="req">*</span></label>
+            <input type="text" id="inp-tahun" placeholder="Contoh: 1447 H">
+            <span class="error-msg">Isi tahun!</span>
         </div>
 
         <div class="control-group w-auto">
-            <label>Materi Ujian</label>
+            <label>Materi Ujian <span class="req">*</span></label>
             <select id="inp-materi">
-                <option value="Fashohah" selected>Fashohah</option>
+                <option value="" disabled selected>-- Pilih Materi --</option>
+                <option value="Fashohah">Fashohah</option>
                 <option value="Tartil">Tartil</option>
                 <option value="Gharib">Gharib</option>
                 <option value="Tajwid">Tajwid</option>
@@ -221,15 +180,21 @@
                 <option value="Sholat">Sholat</option>
                 <option value="Wudhu">Wudhu</option>
             </select>
+            <span class="error-msg">Pilih materi!</span>
         </div>
 
-        <button class="btn-refresh" onclick="refreshData()">Update Tampilan</button>
+        <button class="btn-refresh" onclick="validateAndProcess()">Simpan & Tampilkan</button>
     </div>
 
     <div id="loading" style="text-align: center; margin-top: 50px; color: white;">
-        <h3>Memproses Data...</h3>
+        <h3>Menghubungkan Database...</h3>
     </div>
     
+    <div id="welcome-msg" class="welcome-msg" style="display: none;">
+        <h2>Data Belum Ditampilkan</h2>
+        <p>Silakan lengkapi formulir di atas dan klik tombol <b>"Simpan & Tampilkan"</b>.</p>
+    </div>
+
     <div id="main-output"></div>
 
     <script>
@@ -237,55 +202,136 @@
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Biodata Cek`; 
         const LOGO_FILENAME = "QIRAATI.png"; 
 
-        // State Global
-        let config = {
-            judul: "",
-            bulan: "",
-            tahun: "",
-            materi: ""
-        };
-
+        let config = { judul: "", bulan: "", tahun: "", materi: "" };
         let rawData = [];
+        let isDataLoaded = false;
 
         async function init() {
-            try {
-                const response = await fetch(SHEET_URL);
-                const csvText = await response.text();
-                processRawData(csvText);
+            // 1. Cek Local Storage dulu
+            const savedJudul = localStorage.getItem('ebtaq_judul');
+            const savedBulan = localStorage.getItem('ebtaq_bulan');
+            const savedTahun = localStorage.getItem('ebtaq_tahun');
+            const savedMateri = localStorage.getItem('ebtaq_materi');
+
+            // 2. Jika ada data tersimpan, isi form
+            if (savedJudul && savedBulan && savedTahun && savedMateri) {
+                document.getElementById('inp-judul').value = savedJudul;
+                document.getElementById('inp-bulan').value = savedBulan;
+                document.getElementById('inp-tahun').value = savedTahun;
+                document.getElementById('inp-materi').value = savedMateri;
+                
+                // Load data dan langsung render
+                await loadSheetData(true);
+            } else {
+                // Jika data kosong (Pertama kali / Clear Cache)
                 document.getElementById('loading').style.display = 'none';
-                refreshData(); // Panggil ini untuk set config awal
+                document.getElementById('welcome-msg').style.display = 'block';
+
+                // --- SMART SUGGESTION (Hanya saran, tidak disimpan) ---
+                // Isi tahun otomatis di placeholder atau value sementara, tapi user wajib klik simpan
+                try {
+                    const hijriDate = new Intl.DateTimeFormat('id-ID-u-ca-islamic', { year: 'numeric' }).format(new Date());
+                    const yearStr = hijriDate.replace(' AH', '') + " H";
+                    document.getElementById('inp-tahun').value = yearStr; // Pre-fill agar user tidak capek ngetik
+                } catch(e) {}
+            }
+        }
+
+        async function loadSheetData(autoRender = false) {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('welcome-msg').style.display = 'none';
+            
+            try {
+                if(rawData.length === 0) { // Fetch hanya jika belum punya data
+                    const response = await fetch(SHEET_URL);
+                    const csvText = await response.text();
+                    processRawData(csvText);
+                }
+                document.getElementById('loading').style.display = 'none';
+                isDataLoaded = true;
+                if(autoRender) refreshConfigAndRender();
             } catch (error) {
-                document.getElementById('loading').innerText = "Gagal memuat data: " + error.message;
+                document.getElementById('loading').innerText = "Gagal memuat: " + error.message;
             }
         }
 
         function processRawData(csvText) {
             const rows = csvText.trim().split('\n').filter(r => r.trim().length > 0);
             const headers = rows[0].split(',').map(h => h.trim().replace(/"/g, ''));
-            
             rawData = [];
             for (let i = 1; i < rows.length; i++) {
                 const rowData = rows[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
                 let p = {};
                 rowData.forEach((val, idx) => { p[headers[idx]] = val ? val.trim().replace(/"/g, '') : ''; });
-                
                 let noStr = p['NOMOR'] || p['Nomor'];
                 p['INT_NO'] = noStr ? parseInt(noStr) : (i); 
                 p['DISP_NO'] = noStr ? String(noStr).padStart(3, '0') : String(i).padStart(3, '0');
                 p['GEL'] = (p['Gelombang'] || '-').trim();
                 p['SHIFT'] = (p['Shift'] || '-').trim();
-
                 rawData.push(p);
             }
         }
 
-        function refreshData() {
-            // Update config dari Panel Kontrol
+        // --- FUNGSI VALIDASI ---
+        function validateAndProcess() {
+            // Ambil elemen
+            const elJudul = document.getElementById('inp-judul');
+            const elBulan = document.getElementById('inp-bulan');
+            const elTahun = document.getElementById('inp-tahun');
+            const elMateri = document.getElementById('inp-materi');
+
+            // Reset Error Styles
+            [elJudul, elBulan, elTahun, elMateri].forEach(el => {
+                el.classList.remove('input-error');
+                const msg = el.parentElement.querySelector('.error-msg');
+                if(msg) msg.style.display = 'none';
+            });
+
+            let isValid = true;
+
+            // Cek Judul
+            if (!elJudul.value.trim()) {
+                setError(elJudul); isValid = false;
+            }
+            // Cek Bulan
+            if (!elBulan.value) {
+                setError(elBulan); isValid = false;
+            }
+            // Cek Tahun
+            if (!elTahun.value.trim()) {
+                setError(elTahun); isValid = false;
+            }
+            // Cek Materi
+            if (!elMateri.value) {
+                setError(elMateri); isValid = false;
+            }
+
+            if (!isValid) return; // Stop jika tidak valid
+
+            // Jika Valid -> Simpan ke Storage & Proses
+            localStorage.setItem('ebtaq_judul', elJudul.value);
+            localStorage.setItem('ebtaq_bulan', elBulan.value);
+            localStorage.setItem('ebtaq_tahun', elTahun.value);
+            localStorage.setItem('ebtaq_materi', elMateri.value);
+
+            if (!isDataLoaded) {
+                loadSheetData(true);
+            } else {
+                refreshConfigAndRender();
+            }
+        }
+
+        function setError(element) {
+            element.classList.add('input-error');
+            const msg = element.parentElement.querySelector('.error-msg');
+            if(msg) msg.style.display = 'block';
+        }
+
+        function refreshConfigAndRender() {
             config.judul = document.getElementById('inp-judul').value;
             config.bulan = document.getElementById('inp-bulan').value;
             config.tahun = document.getElementById('inp-tahun').value;
             config.materi = document.getElementById('inp-materi').value;
-            
             renderDocs();
         }
 
@@ -308,7 +354,6 @@
             });
 
             let globalPageCount = 1;
-            
             sortedKeys.forEach(key => {
                 let participants = groups[key].sort((a, b) => a['INT_NO'] - b['INT_NO']);
                 const PER_PAGE = 50;
@@ -318,7 +363,6 @@
                     const start = i * PER_PAGE;
                     const end = start + PER_PAGE;
                     const chunk = participants.slice(start, end);
-                    
                     const currentGel = chunk[0]['GEL'];
                     const currentShift = chunk[0]['SHIFT'];
 
@@ -346,7 +390,6 @@
         function createPageHTML(participants, gel, shift) {
             const page = document.createElement('div');
             page.className = 'page-container';
-
             const leftData = participants.slice(0, 25);
             const rightData = participants.slice(25, 50);
 
@@ -364,15 +407,11 @@
 
             const leftRows = createRows(leftData, 25);
             const rightRows = createRows(rightData, 25);
-
-            // Gabungkan Bulan + Tahun untuk tampilan
-            const periodeDisplay = `${config.bulan} ${config.tahun}`;
+            const periodeFull = `${config.bulan} ${config.tahun}`;
 
             page.innerHTML = `
                 <div class="kop-surat">
-                    <div class="logo-container">
-                        <img src="${LOGO_FILENAME}" onerror="this.style.display='none'">
-                    </div>
+                    <div class="logo-container"><img src="${LOGO_FILENAME}" onerror="this.style.display='none'"></div>
                     <div class="kop-text">
                         <div class="kop-t1">KOORDINATOR PENDIDIKAN AL-QUR'AN</div>
                         <div class="kop-t2">METODE QIRAATI</div>
@@ -381,46 +420,28 @@
                     </div>
                 </div>
                 <div class="double-line"></div>
-
                 <div class="judul-blangko">
                     <div class="jb-main">BLANGKO REKAPAN PENILAIAN</div>
                     <div class="jb-sub">${config.judul}</div>
                 </div>
-
                 <div class="info-grid">
                     <div class="info-left">
-                        <div class="info-row">
-                            <div class="label">Periode</div><div class="sep">:</div><div class="val">${periodeDisplay}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="label">Materi</div><div class="sep">:</div><div class="val">${config.materi}</div>
-                        </div>
+                        <div class="info-row"><div class="label">Periode</div><div class="sep">:</div><div class="val">${periodeFull}</div></div>
+                        <div class="info-row"><div class="label">Materi</div><div class="sep">:</div><div class="val">${config.materi}</div></div>
                     </div>
                     <div class="info-right">
-                        <div class="info-row">
-                            <div class="label">Gelombang</div><div class="sep">:</div><div class="val">${gel}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="label">Shift</div><div class="sep">:</div><div class="val">${getShiftDisplay(shift)}</div>
-                        </div>
+                        <div class="info-row"><div class="label">Gelombang</div><div class="sep">:</div><div class="val">${gel}</div></div>
+                        <div class="info-row"><div class="label">Shift</div><div class="sep">:</div><div class="val">${getShiftDisplay(shift)}</div></div>
                     </div>
                 </div>
-
                 <div class="split-table-container">
                     <div class="table-column">
-                        <table>
-                            <thead><tr><th class="col-no">NO</th><th class="col-nilai">NILAI</th></tr></thead>
-                            <tbody>${leftRows}</tbody>
-                        </table>
+                        <table><thead><tr><th class="col-no">NO</th><th class="col-nilai">NILAI</th></tr></thead><tbody>${leftRows}</tbody></table>
                     </div>
                     <div class="table-column">
-                        <table>
-                            <thead><tr><th class="col-no">NO</th><th class="col-nilai">NILAI</th></tr></thead>
-                            <tbody>${rightRows}</tbody>
-                        </table>
+                        <table><thead><tr><th class="col-no">NO</th><th class="col-nilai">NILAI</th></tr></thead><tbody>${rightRows}</tbody></table>
                     </div>
                 </div>
-
                 <div class="footer-legal">
                     <div class="sign-box">
                         <div class="sign-place">Penguji,</div>
