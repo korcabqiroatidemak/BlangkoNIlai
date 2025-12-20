@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Massal EBTAQ (Fix Scroll Max 5)</title>
+    <title>Cetak Massal EBTAQ (Global Page Number)</title>
     
     <style>
         /* ================================================= */
@@ -37,7 +37,7 @@
         /* --- GRID UTAMA --- */
         .cp-grid-section { 
             display: flex; gap: 20px; 
-            align-items: stretch; /* Tinggi kolom kanan & kiri sama */
+            align-items: stretch; 
         }
         .cp-col { 
             flex: 1; display: flex; flex-direction: column; gap: 5px; 
@@ -50,7 +50,7 @@
             display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* === KIRI: MATERI (GRID 2 KOLOM KE BAWAH) === */
+        /* MATERI: GRID 2 KOLOM */
         .checkbox-group-materi {
             display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
             max-height: 150px; overflow-y: auto; padding: 8px; 
@@ -64,40 +64,23 @@
         }
         .custom-row { display: flex; gap: 8px; align-items: center; }
 
-        /* === KANAN: SESI/SHIFT (GRID MAX 5 BARIS -> GESER KANAN) === */
+        /* SESI: GRID MAX 5 BARIS (SCROLL SAMPING) */
         #container-shift-checkbox {
             flex: 1; 
             border: 1px solid #e0e0e0; background: #fafafa; border-radius: 4px;
             padding: 10px;
-            
-            /* --- LOGIKA BARU MAX 5 BARIS --- */
             display: grid;
-            
-            /* KUNCI: Hanya boleh 5 baris. 'auto' menyesuaikan tinggi konten */
             grid-template-rows: repeat(5, auto); 
-            
-            /* KUNCI: Jika penuh, buat kolom baru di kanan */
             grid-auto-flow: column; 
-            
-            /* Jarak: Vertikal 8px, Horizontal 25px */
             gap: 8px 25px; 
-            
-            /* Scrollbar */
             overflow-x: auto; 
             overflow-y: hidden;
-            
-            /* Kosmetik Scrollbar (Opsional - agar terlihat manis) */
-            scrollbar-width: thin; 
-            scrollbar-color: #ccc #f0f0f0;
         }
-        
-        /* Agar teks panjang tidak turun baris (tetap satu garis) */
         #container-shift-checkbox .cb-item { white-space: nowrap; }
 
-        /* ITEM CHECKBOX UMUM */
+        /* ITEM UMUM */
         .cb-item { display: flex; align-items: center; gap: 5px; font-size: 13px; font-family: Arial, sans-serif; }
         .cb-item input { margin: 0; cursor: pointer; }
-
 
         /* INPUT STYLES */
         .control-group { display: flex; flex-direction: column; gap: 5px; }
@@ -125,13 +108,13 @@
         }
 
         /* ================================================= */
-        /* 2. KERTAS F4 (MARGIN 1.5 CM)                      */
+        /* 2. KERTAS F4                                      */
         /* ================================================= */
         .page-container {
             background-color: white; width: 215mm; height: 330mm; 
             margin: 0 auto 0 auto; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
             box-sizing: border-box; 
-            padding: 10mm 15mm 15mm 15mm; /* Margin Bawah 15mm */
+            padding: 10mm 15mm 15mm 15mm; 
             display: flex; flex-direction: column; position: relative;
         }
 
@@ -143,7 +126,7 @@
         }
 
         /* ================================================= */
-        /* 3. DESAIN BLANGKO (TABEL MELAR)                   */
+        /* 3. DESAIN BLANGKO                                 */
         /* ================================================= */
         .kop-surat { display: flex; align-items: center; justify-content: center; margin-bottom: 2px; position: relative; flex-shrink: 0; }
         .logo-container { position: absolute; left: 0; top: 0; bottom: 0; width: 70px; display: flex; align-items: center; justify-content: flex-start; }
@@ -166,35 +149,20 @@
         .sep { width: 15px; }
         .val { flex: 1; }
 
-        /* Container Tabel */
-        .split-table-container { 
-            display: flex; gap: 10mm; flex: 1; margin-bottom: 5px;
-        }
+        .split-table-container { display: flex; gap: 10mm; flex: 1; margin-bottom: 5px; }
         .table-column { flex: 1; display: flex; flex-direction: column; }
         
-        table { 
-            width: 100%; height: 100%; /* Auto Height */
-            border-collapse: collapse; font-size: 11pt; 
-        }
-        th { 
-            border: 1px solid #000; padding: 5px; background-color: #f0f0f0; 
-            font-weight: bold; text-align: center; height: 30px; 
-        }
-        td { 
-            border: 1px solid #000; padding: 0 5px; vertical-align: middle; 
-        }
+        table { width: 100%; height: 100%; border-collapse: collapse; font-size: 11pt; }
+        th { border: 1px solid #000; padding: 5px; background-color: #f0f0f0; font-weight: bold; text-align: center; height: 30px; }
+        td { border: 1px solid #000; padding: 0 5px; vertical-align: middle; }
         .col-no { width: 15%; text-align: center; font-weight: bold; }
         .col-nilai { width: 85%; }
 
-        /* Footer Compact */
         .footer-legal { display: flex; justify-content: flex-end; font-size: 11pt; flex-shrink: 0; }
         .sign-box { width: 250px; text-align: center; }
         .sign-space { height: 12mm; } 
         .sign-name { text-decoration: underline; font-weight: bold; }
-        .sign-hint {
-            font-size: 9pt; color: rgba(0,0,0,0.4); font-style: italic; margin-top: 2px;
-            -webkit-print-color-adjust: exact;
-        }
+        .sign-hint { font-size: 9pt; color: rgba(0,0,0,0.4); font-style: italic; margin-top: 2px; -webkit-print-color-adjust: exact; }
     </style>
 </head>
 <body>
@@ -378,25 +346,34 @@
             const tahun = document.getElementById('inp-tahun').value;
             localStorage.setItem('ebtaq_judul', judul); 
 
+            // 1. KUMPULKAN MATERI
             let materialsToPrint = [];
-            
             const chkMats = document.querySelectorAll('input[name="chk-materi"]:checked');
             chkMats.forEach(cb => materialsToPrint.push(cb.value));
-
             const customMat = document.getElementById('inp-custom-materi').value.trim();
             if(customMat) materialsToPrint.push(customMat);
             if(document.getElementById('chk-blank-materi').checked) materialsToPrint.push("........................................");
 
-            if(materialsToPrint.length === 0) {
-                alert("Pilih Materi terlebih dahulu!");
-                return;
-            }
+            if(materialsToPrint.length === 0) { alert("Pilih Materi terlebih dahulu!"); return; }
 
+            // 2. KUMPULKAN SHIFT
             const chkShifts = document.querySelectorAll('input[name="chk-shift"]:checked');
-            if(chkShifts.length === 0) {
-                alert("Pilih Sesi terlebih dahulu!");
-                return;
-            }
+            if(chkShifts.length === 0) { alert("Pilih Sesi terlebih dahulu!"); return; }
+
+            // 3. HITUNG TOTAL HALAMAN GLOBAL (Pre-Calculation)
+            // Ini untuk memastikan angka "dari Total X" selalu benar, meskipun ada kelas yang > 50 anak.
+            let grandTotalPages = 0;
+            materialsToPrint.forEach(mat => {
+                chkShifts.forEach(shiftCb => {
+                    const shiftKey = shiftCb.value;
+                    const participants = groupedData[shiftKey];
+                    // Hitung butuh berapa halaman untuk shift ini (ceil: pembulatan ke atas)
+                    grandTotalPages += Math.ceil(participants.length / 50);
+                });
+            });
+
+            // 4. GENERATE HALAMAN
+            let globalPageCounter = 1; // Counter berjalan
 
             materialsToPrint.forEach(materiName => {
                 chkShifts.forEach(shiftCb => {
@@ -405,18 +382,22 @@
                     const [gel, shift] = shiftKey.split('-');
 
                     const PER_PAGE = 50;
-                    const totalPages = Math.ceil(participants.length / PER_PAGE);
+                    const shiftPages = Math.ceil(participants.length / PER_PAGE);
 
-                    for (let i = 0; i < totalPages; i++) {
+                    for (let i = 0; i < shiftPages; i++) {
                         const chunk = participants.slice(i*PER_PAGE, (i+1)*PER_PAGE);
                         const pageHTML = createPage(chunk, { judul, bulan, tahun, materi: materiName, gel, shift });
                         
                         const lbl = document.createElement('div');
                         lbl.className = 'page-label';
-                        lbl.innerHTML = `MATERI: <b>${materiName}</b> | GEL ${gel} SHIFT ${shift} | HAL ${i+1}/${totalPages}`;
+                        
+                        // LABEL GLOBAL: Halaman 1 dari 10, 2 dari 10, dst.
+                        lbl.innerHTML = `MATERI: <b>${materiName}</b> | GEL ${gel} SHIFT ${shift} | HALAMAN ${globalPageCounter} DARI ${grandTotalPages}`;
                         
                         output.appendChild(lbl);
                         output.appendChild(pageHTML);
+                        
+                        globalPageCounter++; // Naikkan hitungan
                     }
                 });
             });
