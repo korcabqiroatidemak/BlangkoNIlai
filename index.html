@@ -250,9 +250,13 @@
     <div id="main-output"></div>
 
     <script>
-        const SHEET_ID = '1eIcvIgCLWG3F9jQdsw5XN9llOsK2PoYWKUg1qaQJyyA';
-        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Biodata Cek`; 
-        const LOGO_FILENAME = ".png"; 
+        // UPDATE: GID dan ID Target Sheet BIO (Tunggal)
+        const SHEET_ID = '180oIFF3WRaijxLn_LZiu12f0m5mTxZ8DY3w4t1Jd5FY';
+        const GID_BIO = '644681055';
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_BIO}`; 
+        
+        // UPDATE: Perbaikan nama file logo
+        const LOGO_FILENAME = "QIRAATI.png"; 
 
         let rawData = [];
         let groupedData = {}; 
@@ -272,16 +276,25 @@
 
             try {
                 const res = await fetch(SHEET_URL);
+                if (!res.ok) throw new Error("Gagal mengambil data dari Google Sheets.");
+                
                 const txt = await res.text();
+                // Validasi Celah Akses Sharing Document
+                if (txt.startsWith("<!DOCTYPE html>")) {
+                    throw new Error("Akses ditolak. Silakan ubah izin berbagi Google Sheet menjadi Publik (Siapa saja yang memiliki link).");
+                }
+                
                 processData(txt);
                 document.getElementById('loading').style.display = 'none';
             } catch (err) {
+                document.getElementById('loading').innerHTML = `<h3 style="color:#ef4444;">Error: ${err.message}</h3>`;
                 alert("Gagal load data: " + err.message);
             }
         }
 
         function processData(csvText) {
             const rows = csvText.trim().split('\n').filter(r => r.trim().length > 0);
+            if (rows.length < 2) return;
             const headers = rows[0].split(',').map(h => h.trim().replace(/"/g, ''));
             
             rawData = [];
@@ -290,11 +303,12 @@
                 let p = {};
                 r.forEach((val, idx) => { p[headers[idx]] = val ? val.trim().replace(/"/g, '') : ''; });
                 
-                let noStr = p['NOMOR'] || p['Nomor'];
+                // UPDATE: Pemetaan ke header Kolom Sheet BIO
+                let noStr = p['NO.'] || p['NOMOR'] || '';
                 p['INT_NO'] = noStr ? parseInt(noStr) : i; 
                 p['DISP_NO'] = noStr ? String(noStr).padStart(3, '0') : String(i).padStart(3, '0');
-                p['GEL'] = (p['Gelombang'] || '-').trim();
-                p['SHIFT'] = (p['Shift'] || '-').trim();
+                p['GEL'] = (p['GELOMBANG'] || '-').trim();
+                p['SHIFT'] = (p['SHIFT'] || '-').trim();
                 rawData.push(p);
             }
 
@@ -361,19 +375,17 @@
             if(chkShifts.length === 0) { alert("Pilih Sesi terlebih dahulu!"); return; }
 
             // 3. HITUNG TOTAL HALAMAN GLOBAL (Pre-Calculation)
-            // Ini untuk memastikan angka "dari Total X" selalu benar, meskipun ada kelas yang > 50 anak.
             let grandTotalPages = 0;
             materialsToPrint.forEach(mat => {
                 chkShifts.forEach(shiftCb => {
                     const shiftKey = shiftCb.value;
                     const participants = groupedData[shiftKey];
-                    // Hitung butuh berapa halaman untuk shift ini (ceil: pembulatan ke atas)
                     grandTotalPages += Math.ceil(participants.length / 50);
                 });
             });
 
             // 4. GENERATE HALAMAN
-            let globalPageCounter = 1; // Counter berjalan
+            let globalPageCounter = 1; 
 
             materialsToPrint.forEach(materiName => {
                 chkShifts.forEach(shiftCb => {
@@ -397,7 +409,7 @@
                         output.appendChild(lbl);
                         output.appendChild(pageHTML);
                         
-                        globalPageCounter++; // Naikkan hitungan
+                        globalPageCounter++; 
                     }
                 });
             });
